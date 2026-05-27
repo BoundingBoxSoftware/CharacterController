@@ -16,6 +16,14 @@ This project uses a Physics Manager script that tells physics when to update.  U
 
 Usually it is advised to update physics objects in FixedUpdate so that the physics update can fix any issues you may have created.  A problem with this is that FixedUpdate runs before the physics update and what you end up with is the raw output of the physics.  What the character controller does instead is add corrections to the physics like moving the character up steps and applying world motion.  It tries its best to stop the character from being moved through any collision when making these corrections.  The only physics change is to the rigitbody velocity that does not change the position until th physics update on the next frame.
 
+### Rigidbody Core
+
+At its core this character controller is a rigibbody.  It will interact with other rigid bodies in expected ways.
+
+### Ground Slope Estimation
+
+A triangulated mesh pattern of raycasts is used to esimate the ground slope based on multiple height points.  This means that geometry like stairs will be averaged into a slope for smooth traversal.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details
