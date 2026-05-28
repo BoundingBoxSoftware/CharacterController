@@ -331,7 +331,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &6215225961999279559
@@ -346,7 +346,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 559c7622770b79e4cb65effdfd263ed2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterControllerBase
-  useFixedUpdate: 0
   visuals: {fileID: 3512907138183855962}
   visualsOffsetThreshold: 0.01
   maxVisualsOffset: 0.5
@@ -362,7 +361,7 @@ MonoBehaviour:
   floorFudge: 0.125
   minSlope: 30
   maxSlope: 50
-  maxSpeed: 10
+  maxWalkSpeed: 10
   maxRunSpeed: 10
   airDrag: 1
   fallDrag: 0.25

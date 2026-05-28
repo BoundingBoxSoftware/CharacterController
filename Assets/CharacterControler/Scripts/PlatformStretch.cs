@@ -10,19 +10,42 @@ public class PlatformStratch : MonoBehaviour
     Vector3 originalScale = Vector3.one;
     float time = 0f;
     
+    Rigidbody thisRigidbody;
+
+    void Awake() {
+        thisRigidbody = GetComponent<Rigidbody>();
+    }
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
-        originalScale =transform.localScale;
+        originalScale = transform.localScale;
+    }
+    
+    void Update() {
+        if( !PhysicsManager.s_platformsUseFixedUpdate) UpdatePlatform(false, Time.deltaTime);
+    }
+
+    void FixedUpdate() {
+        if( PhysicsManager.s_platformsUseFixedUpdate) UpdatePlatform(true, Time.fixedDeltaTime);
+    }
+    
+
+    void SetScale(bool fixedDeltaTime, Vector3 newLocalScale) {
+        if (fixedDeltaTime) {
+            transform.localScale = newLocalScale;
+        } else {
+            transform.localScale = newLocalScale;
+        }
     }
 
     // Update is called once per frame
-    void Update() {
+    void UpdatePlatform(bool fixedDeltaTime, float dTime) {
 
-        time += stretchSpeed * Time.deltaTime;
+        time += stretchSpeed * dTime;
         Vector3 localScale = transform.localScale;
         localScale.x = originalScale.x + stretch.x * Mathf.Sin(time);
         localScale.z = originalScale.z + stretch.y * Mathf.Cos(time);
-        transform.localScale = localScale;
+        SetScale(fixedDeltaTime, localScale);
     }
     
 }

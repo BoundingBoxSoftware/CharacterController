@@ -4,6 +4,17 @@ using UnityEngine;
 public class PhysicsManager : MonoBehaviour
 {
 
+    [Tooltip("Set The simulation mode")]
+    public SimulationMode simulationMode = SimulationMode.Script;
+    
+    [Tooltip("Should the platforms use fixed update")]
+    public bool platformsUseFixedUpdate = false;
+    public static bool s_platformsUseFixedUpdate = false;
+    
+    [Tooltip("Should the character controller use fixed update")]
+    public bool characterUseFixedUpdate = false;
+    public static bool s_characterUseFixedUpdate = false;
+    
     // default max time step if 50 which is Unity's default as well
     [Tooltip("The maximum amount of time that can pass in a physics update")]
     public float maxTimeStep = 0.02f;
@@ -29,12 +40,21 @@ public class PhysicsManager : MonoBehaviour
         
         // We want the physics update to happen every frame and BEFORE everything else so call it manually
         // We don't need to use any interpolation on the rigid bodies this way
-        Physics.simulationMode = SimulationMode.Script;
+        //Physics.simulationMode = SimulationMode.Script;
         
     }
 
     // Update is called once per frame
     void Update() {
+        
+        s_platformsUseFixedUpdate = platformsUseFixedUpdate;
+        s_characterUseFixedUpdate = characterUseFixedUpdate;
+
+        if (Physics.simulationMode != simulationMode) Physics.simulationMode = simulationMode;
+
+        if (simulationMode != SimulationMode.Script) return;
+        
+        
         if (Physics.simulationMode == SimulationMode.Script) {
             // Sync transforms
             Physics.SyncTransforms();

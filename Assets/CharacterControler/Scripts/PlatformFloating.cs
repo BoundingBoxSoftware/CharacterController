@@ -40,9 +40,17 @@ public class PlatformFloating : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update() {
-        float dTime = Time.deltaTime;
+        if( !PhysicsManager.s_platformsUseFixedUpdate) UpdatePlatform(false, Time.deltaTime);
+    }
+
+    void FixedUpdate() {
+        if( PhysicsManager.s_platformsUseFixedUpdate) UpdatePlatform(true, Time.fixedDeltaTime);
+    }
+
+    // Update is called once per frame
+    void UpdatePlatform(bool fixedDeltaTime, float dTime) {
+        
         time += speed * dTime * randomValue;
         
         targetPosition = startPosition + new Vector3(0.0f, Mathf.Sin(time * speed) * height, 0.0f);
@@ -53,7 +61,7 @@ public class PlatformFloating : MonoBehaviour
         Quaternion deltaRotation = targetRotation * Quaternion.Inverse(thisRigidbody.rotation);
         deltaRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
         if (angleInDegrees > 180f) angleInDegrees -= 360f;
-        Vector3 targetAngularVelocity = rotationAxis * (angleInDegrees * Mathf.Deg2Rad);;
+        Vector3 targetAngularVelocity = rotationAxis * (angleInDegrees * Mathf.Deg2Rad);
  
         av += targetAngularVelocity * (dTime * rbRotLerpSpeed);
         thisRigidbody.angularVelocity = av;

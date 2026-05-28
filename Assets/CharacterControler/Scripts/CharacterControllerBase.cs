@@ -10,9 +10,7 @@ using NUnit.Framework.Constraints;
 [DefaultExecutionOrder(1)]
 public class CharacterControllerBase : MonoBehaviour
 {
-	[Header("When To Run")] 
-	[SerializeField] bool useFixedUpdate = false;
-	
+
 	[Header("Visuals")]
 	[SerializeField] GameObject visuals;
 	[SerializeField] float visualsOffsetThreshold = 0.1f;
@@ -232,7 +230,7 @@ public class CharacterControllerBase : MonoBehaviour
     void Update() {
 	    float dTime = Time.deltaTime;
 	    //GetInputs(dTime);
-	    if (!useFixedUpdate) {
+	    if (!PhysicsManager.s_characterUseFixedUpdate) {
 		    WorldMovement(dTime, false);
 		    CheckGround(dTime, false);
 		    Movement(dTime, false);
@@ -241,7 +239,7 @@ public class CharacterControllerBase : MonoBehaviour
     }
 
     void FixedUpdate() {
-	    if (useFixedUpdate) {
+	    if (PhysicsManager.s_characterUseFixedUpdate) {
 		    float dTime = Time.fixedDeltaTime;
 		    WorldMovement(dTime, true);
 		    CheckGround(dTime, true);
@@ -592,23 +590,58 @@ public class CharacterControllerBase : MonoBehaviour
 
 	}
     
+	RaycastHit[] nonAllocHits = new RaycastHit[100];
+    
     // Clips the velocity against the world.  This is helpful when using concave colliders or when your time step gets high.
 	Vector3 ClipVelocity(Vector3 thisVelocity, float dTime) {
-		
+
 		for (int i = 0; i < verticalSamplePoints.Length; i++) {
-			
+
 			// get the distance we are traveling this frame
 			float velocityDist = thisVelocity.magnitude * dTime;
-			
+
 			// if the distance we are traveling is low just return it.
 			if (velocityDist < velocityClipThreshold) return thisVelocity;
-			
+
 			Vector3 newOrigin = transform.position + verticalSamplePoints[i];
-			
-			if (Physics.SphereCast(newOrigin, sphereCastRadiusInner, thisVelocity, out RaycastHit hit, velocityDist + sphereCastRadiusThickness, worldMask, QueryTriggerInteraction.Ignore)) {
-				thisVelocity *= (hit.distance - sphereCastRadiusThickness) / velocityDist;
-				Debug.DrawLine(newOrigin, newOrigin + thisVelocity, Color.red, 5.0f);
+
+			if (PhysicsManager.s_characterUseFixedUpdate) {
+				RaycastHit[] hits = Physics.SphereCastAll(newOrigin, sphereCastRadiusInner, thisVelocity, velocityDist + sphereCastRadiusThickness, worldMask, QueryTriggerInteraction.Ignore);
+
+				float closestDist = velocityDist - sphereCastRadiusThickness;
+				bool hitSomething = false;
+
+				for (int j = 0; j < hits.Length; j++) {
+
+					RaycastHit hit = hits[j];
+					
+					//don't clip velocity against a dynamic rigid body
+					Rigidbody hitRb = hit.transform.GetComponent<Rigidbody>();
+					if (hitRb != null) {
+						if (!hitRb.isKinematic) continue;
+					}
+
+					if (hit.distance < closestDist) {
+						hitSomething = true;
+						closestDist = hit.distance;
+					}
+
+				}
+
+				if (hitSomething) {
+					thisVelocity *= (closestDist - sphereCastRadiusThickness) / velocityDist;
+					Debug.DrawLine(newOrigin, newOrigin + thisVelocity, Color.red, 5.0f);
+				}
+
+			} else{
+
+				if (Physics.SphereCast(newOrigin, sphereCastRadiusInner, thisVelocity, out RaycastHit hit, velocityDist + sphereCastRadiusThickness, worldMask, QueryTriggerInteraction.Ignore)) {
+					thisVelocity *= (hit.distance - sphereCastRadiusThickness) / velocityDist;
+					Debug.DrawLine(newOrigin, newOrigin + thisVelocity, Color.red, 5.0f);
+				}
+
 			}
+
 		}
 		
 		return thisVelocity;

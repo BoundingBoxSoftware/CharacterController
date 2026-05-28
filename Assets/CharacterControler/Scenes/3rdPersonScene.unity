@@ -848,6 +848,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e147f6c3e6db6a4ea15483a5b9a4c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhysicsManager
+  simulationMode: 2
+  platformsUseFixedUpdate: 0
+  characterUseFixedUpdate: 0
   maxTimeStep: 0.02
   maxStepSlices: 2
   allowSlowDown: 1

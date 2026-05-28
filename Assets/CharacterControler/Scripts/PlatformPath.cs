@@ -24,9 +24,12 @@ public class PlatformPath : MonoBehaviour
     
     Rigidbody thisRigidbody;
     
+    void Awake() {
+        thisRigidbody = GetComponent<Rigidbody>();
+    }
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
-        thisRigidbody = GetComponent<Rigidbody>();
         
         transform.position = startNode.transform.position;
         currentNode = startNode;
@@ -40,10 +43,17 @@ public class PlatformPath : MonoBehaviour
         targetRotation = transform.rotation;
 
     }
+    
+    void Update() {
+        if( !PhysicsManager.s_platformsUseFixedUpdate) UpdatePlatform(false, Time.deltaTime);
+    }
+
+    void FixedUpdate() {
+        if( PhysicsManager.s_platformsUseFixedUpdate) UpdatePlatform(true, Time.fixedDeltaTime);
+    }
 
     // Update is called once per frame
-    void Update() {
-        float dTime = Time.deltaTime;
+    void UpdatePlatform(bool fixedDeltaTime, float dTime) {
         
         pathLerp = Mathf.Clamp01(pathLerp + dTime * speed);
         if (pathLerp >= 1f) {
